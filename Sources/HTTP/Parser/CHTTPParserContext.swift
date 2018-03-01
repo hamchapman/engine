@@ -160,6 +160,7 @@ extension CHTTPParserContext {
         // to the parser, it is signaling an error
         // - 1 to allow room for filtering a possibly final \r\n which I observed the parser does
         guard parsedCount >= buffer.count - 2, parsedCount <= buffer.count else {
+            DEBUG("buffer.count \(buffer.count)")
             throw HTTPError.invalidMessage(source: .capture())
         }
     }
@@ -197,7 +198,7 @@ extension CHTTPParserContext {
             /// (there will be no `headerStart` pointer, and buffer start contains non-header data)
             return
         }
-        
+
         /// This vaguely ridiculous wrapper block ensures we don't access memory
         /// improperly - even though that wasn't really a problem anyway. Silly
         /// (yet helpful) memory type binding rules.
@@ -236,7 +237,7 @@ extension CHTTPParserContext {
                 headersDataSize += distance
             }
         }
-        
+
         /// if this buffer copy is happening after headers complete indication,
         /// set the headers struct for later retreival
         if headersComplete {

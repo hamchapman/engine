@@ -27,9 +27,10 @@ public final class HTTPRequestParser: CHTTPParser {
     func makeMessage(using body: HTTPBody) throws -> HTTPRequest {
         // require a version to have been parsed
         guard let version = chttp.version, let headers = chttp.headers, let cmethod = chttp.method else {
+            DEBUG("chttp.version \(chttp.version), chttp.headers \(chttp.headers), chttp.method \(chttp.method)")
             throw HTTPError.invalidMessage(source: .capture())
         }
-        
+
         /// switch on the C method type from the parser
         let method: HTTPMethod
         switch cmethod {
@@ -53,19 +54,20 @@ public final class HTTPRequestParser: CHTTPParser {
                 let pointer = http_method_str(cmethod),
                 let string = String(validatingUTF8: pointer)
             else {
+                DEBUG("pointer (method) \(cmethod)")
                 throw HTTPError.invalidMessage(source: .capture())
             }
             method = HTTPMethod(string)
         }
-        
+
         // parse the uri from the url bytes.
         var uri = URI(buffer: chttp.urlData)
-        
+
         // if there is no scheme, use http by default
         if uri.scheme?.isEmpty == true {
             uri.scheme = "http"
         }
-        
+
         // create the request
         return HTTPRequest(
             method: method,
